@@ -20,47 +20,18 @@ jobs:
           channel: stable
 
       - name: Create Android Project
-        run: flutter create --platforms=android .
+        run: flutter create --platforms=android --org com.sayyar .
 
       - name: Setup Firebase
         run: |
           mkdir -p android/app
           cp google-services.json android/app/google-services.json
-          python3 - <<'PY'
-          from pathlib import Path
 
-          settings = Path("android/settings.gradle")
-          if not settings.exists():
-              settings = Path("android/settings.gradle.kts")
+          sed -i "s/applicationId = \"com.example.sayyar_go\"/applicationId = \"com.sayyar.driver\"/" android/app/build.gradle.kts
+          sed -i "s/applicationId \"com.example.sayyar_go\"/applicationId \"com.sayyar.driver\"/" android/app/build.gradle
 
-          app = Path("android/app/build.gradle")
-          if not app.exists():
-              app = Path("android/app/build.gradle.kts")
-
-          s = settings.read_text()
-          if "com.google.gms.google-services" not in s:
-              if settings.suffix == ".kts":
-                  s = s.replace(
-                      "plugins {",
-                      'plugins {\n    id("com.google.gms.google-services") version "4.4.2" apply false',
-                      1
-                  )
-              else:
-                  s = s.replace(
-                      "plugins {",
-                      'plugins {\n    id "com.google.gms.google-services" version "4.4.2" apply false',
-                      1
-                  )
-              settings.write_text(s)
-
-          a = app.read_text()
-          if "com.google.gms.google-services" not in a:
-              if app.suffix == ".kts":
-                  a = a.replace("plugins {", 'plugins {\n    id("com.google.gms.google-services")', 1)
-              else:
-                  a = a.replace("plugins {", 'plugins {\n    id "com.google.gms.google-services"', 1)
-              app.write_text(a)
-          PY
+          sed -i "s/namespace = \"com.example.sayyar_go\"/namespace = \"com.sayyar.driver\"/" android/app/build.gradle.kts
+          sed -i "s/namespace \"com.example.sayyar_go\"/namespace \"com.sayyar.driver\"/" android/app/build.gradle
 
       - name: Get Packages
         run: flutter pub get
